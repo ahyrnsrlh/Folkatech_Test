@@ -95,7 +95,7 @@ async function listProducts(query = {}) {
        ) AS image
      FROM products p
      ${whereClause}
-     ORDER BY ${sortCol} ${sortDir}
+      ORDER BY ${sortCol} ${sortDir}, p.id ASC
      LIMIT ? OFFSET ?`,
     [...params, limitNum, offset],
   );

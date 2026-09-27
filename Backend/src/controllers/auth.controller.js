@@ -10,6 +10,14 @@ const {
   tokenDocument,
 } = require("../utils/json-api");
 
+function requestAttributes(req) {
+  if (!wantsJsonApi(req)) {
+    return req.body;
+  }
+
+  return req.body?.data?.attributes || req.body;
+}
+
 async function register(req, res, next) {
   try {
     const validationErrors = getValidationErrors(req);
@@ -24,7 +32,8 @@ async function register(req, res, next) {
       return res.status(422).json(validationErrors);
     }
 
-    const { first_name, last_name, email, phone, password } = req.body;
+    const { first_name, last_name, email, phone, password } =
+      requestAttributes(req);
 
     const user = await authService.register({
       first_name,
@@ -66,7 +75,7 @@ async function login(req, res, next) {
       return res.status(422).json(validationErrors);
     }
 
-    const { email, password } = req.body;
+    const { email, password } = requestAttributes(req);
     const result = await authService.login({ email, password });
 
     const response = {

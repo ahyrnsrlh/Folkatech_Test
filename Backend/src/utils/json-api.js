@@ -120,6 +120,7 @@ function tokenDocument(token) {
   return {
     data: {
       type: "auth-tokens",
+      id: "access-token",
       attributes: { token },
     },
   };

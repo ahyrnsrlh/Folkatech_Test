@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
-const { query, validationResult } = require('express-validator');
+const { param, query, validationResult } = require("express-validator");
 
 function getValidationErrors(req) {
   const errors = validationResult(req);
   if (errors.isEmpty()) return null;
 
   return {
-    message: 'Validation failed',
+    message: "Validation failed",
     errors: errors.array().map((e) => ({
       field: e.path,
       message: e.msg,
@@ -16,32 +16,44 @@ function getValidationErrors(req) {
 }
 
 const listProductValidator = [
-  query('page')
+  query("page")
     .optional()
-    .isInt({ min: 1 }).withMessage('Page must be an integer greater than or equal to 1')
+    .isInt({ min: 1 })
+    .withMessage("Page must be an integer greater than or equal to 1")
     .toInt(),
-  query('limit')
+  query("limit")
     .optional()
-    .isInt({ min: 1, max: 100 }).withMessage('Limit must be an integer between 1 and 100')
+    .isInt({ min: 1, max: 100 })
+    .withMessage("Limit must be an integer between 1 and 100")
     .toInt(),
-  query('sort')
+  query("sort")
     .optional()
-    .isIn(['name', 'price', 'rating', 'review_count', 'created_at', 'id'])
-    .withMessage('Sort must be one of: name, price, rating, review_count, created_at, id'),
-  query('order')
+    .isIn(["name", "price", "rating", "review_count", "created_at", "id"])
+    .withMessage(
+      "Sort must be one of: name, price, rating, review_count, created_at, id",
+    ),
+  query("order")
     .optional()
     .toLowerCase()
-    .isIn(['asc', 'desc'])
-    .withMessage('Order must be either asc or desc'),
-  query('search').optional().trim(),
-  query('origin').optional().trim(),
-  query('species').optional().trim(),
-  query('roast_level').optional().trim(),
-  query('tasted').optional().trim(),
-  query('processing').optional().trim(),
+    .isIn(["asc", "desc"])
+    .withMessage("Order must be either asc or desc"),
+  query("search").optional().trim(),
+  query("origin").optional().trim(),
+  query("species").optional().trim(),
+  query("roast_level").optional().trim(),
+  query("tasted").optional().trim(),
+  query("processing").optional().trim(),
+];
+
+const productIdValidator = [
+  param("id")
+    .isInt({ min: 1 })
+    .withMessage("Product ID must be a positive integer")
+    .toInt(),
 ];
 
 module.exports = {
   listProductValidator,
+  productIdValidator,
   getValidationErrors,
 };

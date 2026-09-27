@@ -1,16 +1,29 @@
-'use strict';
+"use strict";
 
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const {
+  wantsJsonApi,
+  sendJsonApi,
+  errorDocument,
+} = require("../utils/json-api");
+
+function unauthorized(req, res, message) {
+  if (wantsJsonApi(req)) {
+    return sendJsonApi(res, 401, errorDocument(401, "Unauthorized", message));
+  }
+
+  return res.status(401).json({ message });
+}
 
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return unauthorized(req, res, "Unauthorized");
   }
 
   const token = authHeader.slice(7).trim();
   if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return unauthorized(req, res, "Unauthorized");
   }
 
   try {
@@ -18,7 +31,7 @@ function authenticate(req, res, next) {
     req.user = decoded;
     return next();
   } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+    return unauthorized(req, res, "Invalid or expired token");
   }
 }
 

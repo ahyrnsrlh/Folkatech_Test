@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-const { pool } = require('../config/database');
+const { pool } = require("../config/database");
 
 const SORT_COLUMNS = {
-  name: 'p.name',
-  price: 'p.price',
-  rating: 'p.rating',
-  review_count: 'p.review_count',
-  created_at: 'p.created_at',
-  id: 'p.id',
+  name: "p.name",
+  price: "p.price",
+  rating: "p.rating",
+  review_count: "p.review_count",
+  created_at: "p.created_at",
+  id: "p.id",
 };
 
 async function listProducts(query = {}) {
@@ -16,7 +16,7 @@ async function listProducts(query = {}) {
     page = 1,
     limit = 12,
     sort,
-    order = 'asc',
+    order = "asc",
     search,
     origin,
     species,
@@ -33,46 +33,49 @@ async function listProducts(query = {}) {
   const params = [];
 
   if (search && search.trim()) {
-    conditions.push('(p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)');
+    conditions.push(
+      "(p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)",
+    );
     const term = `%${search.trim()}%`;
     params.push(term, term, term);
   }
 
   if (origin && origin.trim()) {
-    conditions.push('p.origin = ?');
+    conditions.push("p.origin = ?");
     params.push(origin.trim());
   }
 
   if (species && species.trim()) {
-    conditions.push('p.species = ?');
+    conditions.push("p.species = ?");
     params.push(species.trim());
   }
 
   if (roast_level && roast_level.trim()) {
-    conditions.push('p.roast_level = ?');
+    conditions.push("p.roast_level = ?");
     params.push(roast_level.trim());
   }
 
   if (tasted && tasted.trim()) {
-    conditions.push('p.tasted = ?');
+    conditions.push("p.tasted = ?");
     params.push(tasted.trim());
   }
 
   if (processing && processing.trim()) {
-    conditions.push('p.processing = ?');
+    conditions.push("p.processing = ?");
     params.push(processing.trim());
   }
 
-  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const [countResult] = await pool.execute(
     `SELECT COUNT(*) AS total FROM products p ${whereClause}`,
-    params
+    params,
   );
   const total = Number(countResult[0]?.total || 0);
 
-  const sortCol = SORT_COLUMNS[sort] || 'p.id';
-  const sortDir = String(order).toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+  const sortCol = SORT_COLUMNS[sort] || "p.id";
+  const sortDir = String(order).toLowerCase() === "desc" ? "DESC" : "ASC";
 
   // Primary image lookup avoids N+1 queries by selecting in one pass
   const [rows] = await pool.execute(
@@ -94,7 +97,7 @@ async function listProducts(query = {}) {
      ${whereClause}
      ORDER BY ${sortCol} ${sortDir}
      LIMIT ? OFFSET ?`,
-    [...params, limitNum, offset]
+    [...params, limitNum, offset],
   );
 
   const data = rows.map((r) => ({
@@ -120,6 +123,67 @@ async function listProducts(query = {}) {
   };
 }
 
+async function getProductById(id) {
+  const [rows] = await pool.execute(
+    `SELECT
+       p.id,
+       p.name,
+       p.brand,
+       p.description,
+       p.price,
+       p.stock,
+       p.rating,
+       p.review_count,
+       p.origin,
+       p.species,
+       p.roast_level,
+       p.tasted,
+       p.processing,
+       p.dimensions,
+       p.weight,
+       p.capacity,
+       p.color,
+       pi.id AS image_id,
+       pi.image_url,
+       pi.is_primary
+     FROM products p
+     LEFT JOIN product_images pi ON pi.product_id = p.id
+     WHERE p.id = ?
+     ORDER BY pi.is_primary DESC, pi.id ASC`,
+    [id],
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+  const product = rows[0];
+  return {
+    id: product.id,
+    name: product.name,
+    brand: product.brand,
+    price: Number(product.price),
+    rating: Number(product.rating),
+    review_count: Number(product.review_count),
+    stock: product.stock,
+    description: product.description,
+    specifications: {
+      dimensions: product.dimensions,
+      weight: product.weight,
+      capacity: product.capacity,
+      color: product.color,
+      brand: product.brand,
+    },
+    images: rows
+      .filter((row) => row.image_id !== null)
+      .map((row) => ({
+        url: row.image_url,
+        is_primary: Boolean(row.is_primary),
+      })),
+  };
+}
+
 module.exports = {
   listProducts,
+  getProductById,
 };

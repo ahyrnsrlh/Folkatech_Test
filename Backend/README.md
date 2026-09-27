@@ -1005,7 +1005,7 @@ Bonus tuning sudah diimplementasikan melalui:
 - [x] Database migration dan seeder
 - [x] Postman collection
 - [x] Database indexing/query tuning
-- [x] JSON:API compliance penuh; mode response tersedia
+- [x] JSON:API compliance penuh; mode response tersedia 
 
 ## 17. Catatan
 

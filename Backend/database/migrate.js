@@ -24,12 +24,12 @@ async function migrate() {
       multipleStatements: true,
     });
 
-    console.log('✅ Connected to MySQL');
+    console.log('Connected to MySQL');
 
     await connection.query(
       `CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
     );
-    console.log(`✅ Database '${DB_NAME}' ready`);
+    console.log(`Database '${DB_NAME}' ready`);
 
     await connection.query(`USE \`${DB_NAME}\``);
 
@@ -39,7 +39,7 @@ async function migrate() {
       .sort();
 
     if (files.length === 0) {
-      console.log('ℹ️  No migration files found.');
+      console.log('No migration files found.');
     }
 
     for (const file of files) {
@@ -47,12 +47,12 @@ async function migrate() {
       const sql = fs.readFileSync(filePath, 'utf8');
 
       await connection.query(sql);
-      console.log(`✅ Migrated: ${file}`);
+      console.log(`Migrated: ${file}`);
     }
 
-    console.log('\n🎉 All migrations completed successfully.');
+    console.log('\nAll migrations completed successfully.');
   } catch (error) {
-    console.error('❌ Migration failed:', error.message);
+    console.error('Migration failed:', error.message);
     process.exit(1);
   } finally {
     if (connection) {

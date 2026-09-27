@@ -24,7 +24,7 @@ async function seed() {
       multipleStatements: true,
     });
 
-    console.log(`✅ Connected to '${DB_NAME}'`);
+    console.log(`Connected to '${DB_NAME}'`);
 
     const files = fs
       .readdirSync(SEEDERS_DIR)
@@ -32,7 +32,7 @@ async function seed() {
       .sort();
 
     if (files.length === 0) {
-      console.log('ℹ️  No seeder files found.');
+      console.log('No seeder files found.');
     }
 
     for (const file of files) {
@@ -40,12 +40,12 @@ async function seed() {
       const sql = fs.readFileSync(filePath, 'utf8');
 
       await connection.query(sql);
-      console.log(`✅ Seeded: ${file}`);
+      console.log(`Seeded: ${file}`);
     }
 
-    console.log('\n🎉 All seeders completed successfully.');
+    console.log('\nAll seeders completed successfully.');
   } catch (error) {
-    console.error('❌ Seeding failed:', error.message);
+    console.error('Seeding failed:', error.message);
     process.exit(1);
   } finally {
     if (connection) {

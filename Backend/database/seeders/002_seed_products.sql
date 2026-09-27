@@ -1,5 +1,4 @@
 -- Seeder: 002_seed_products
--- Populates initial coffee equipment and specialty coffee bean products with images and specifications
 
 INSERT INTO `products`
   (`id`, `name`, `brand`, `description`, `price`, `stock`, `rating`, `review_count`, `origin`, `species`, `roast_level`, `tasted`, `processing`, `dimensions`, `weight`, `capacity`, `color`)

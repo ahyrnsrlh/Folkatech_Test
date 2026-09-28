@@ -11,6 +11,37 @@ const SORT_COLUMNS = {
   id: "p.id",
 };
 
+const FILTER_COLUMNS = {
+  origin: "origin",
+  species: "species",
+  roast_level: "roast_level",
+  tasted: "tasted",
+  processing: "processing",
+};
+
+async function getProductFilters() {
+  const entries = await Promise.all(
+    Object.entries(FILTER_COLUMNS).map(async ([key, column]) => {
+      const [rows] = await pool.execute(
+        `SELECT \`${column}\` AS value, COUNT(*) AS count
+         FROM products
+         WHERE \`${column}\` IS NOT NULL
+           AND TRIM(\`${column}\`) <> ''
+           AND LOWER(TRIM(\`${column}\`)) <> 'tidak berlaku'
+         GROUP BY \`${column}\`
+         ORDER BY \`${column}\` ASC`,
+      );
+
+      return [
+        key,
+        rows.map((row) => ({ value: row.value, count: Number(row.count) })),
+      ];
+    }),
+  );
+
+  return Object.fromEntries(entries);
+}
+
 async function listProducts(query = {}) {
   const {
     page = 1,
@@ -18,6 +49,8 @@ async function listProducts(query = {}) {
     sort,
     order = "asc",
     search,
+    min_price,
+    max_price,
     origin,
     species,
     roast_level,
@@ -38,6 +71,16 @@ async function listProducts(query = {}) {
     );
     const term = `%${search.trim()}%`;
     params.push(term, term, term);
+  }
+
+  if (min_price !== undefined && min_price !== "") {
+    conditions.push("p.price >= ?");
+    params.push(Number(min_price));
+  }
+
+  if (max_price !== undefined && max_price !== "") {
+    conditions.push("p.price <= ?");
+    params.push(Number(max_price));
   }
 
   if (origin && origin.trim()) {
@@ -184,6 +227,7 @@ async function getProductById(id) {
 }
 
 module.exports = {
+  getProductFilters,
   listProducts,
   getProductById,
 };

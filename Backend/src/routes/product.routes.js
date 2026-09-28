@@ -10,6 +10,7 @@ const { authenticate } = require("../middleware/auth.middleware");
 
 const router = Router();
 
+router.get("/product-filters", authenticate, productController.getProductFilters);
 router.get(
   "/list-product",
   authenticate,

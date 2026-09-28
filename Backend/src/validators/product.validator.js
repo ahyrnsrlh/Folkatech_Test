@@ -26,6 +26,21 @@ const listProductValidator = [
     .isInt({ min: 1, max: 100 })
     .withMessage("Limit must be an integer between 1 and 100")
     .toInt(),
+  query("min_price")
+    .optional({ checkFalsy: true })
+    .isFloat({ min: 0 })
+    .withMessage("Minimum price must be a non-negative number")
+    .toFloat(),
+  query("max_price")
+    .optional({ checkFalsy: true })
+    .isFloat({ min: 0 })
+    .withMessage("Maximum price must be a non-negative number")
+    .toFloat()
+    .custom((maxPrice, { req }) => {
+      if (req.query.min_price === undefined) return true;
+      return maxPrice >= Number(req.query.min_price);
+    })
+    .withMessage("Maximum price must be greater than or equal to minimum price"),
   query("sort")
     .optional()
     .isIn(["name", "price", "rating", "review_count", "created_at", "id"])

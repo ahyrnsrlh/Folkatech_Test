@@ -329,7 +329,7 @@ ON DUPLICATE KEY UPDATE
 INSERT INTO `product_images`
   (`id`, `product_id`, `image_url`, `is_primary`)
 VALUES
-  (1, 1, '/images/products/hario-press-1.jpg', TRUE),
+  (1, 1, '/images/products/hario-press-1.svg', TRUE),
   (2, 1, '/images/products/hario-press-2.jpg', FALSE),
   (3, 2, '/images/products/abid-1.jpg', TRUE),
   (4, 2, '/images/products/abid-2.jpg', FALSE),

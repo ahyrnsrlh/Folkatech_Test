@@ -36,6 +36,15 @@ async function listProducts(req, res, next) {
   }
 }
 
+async function getProductFilters(req, res, next) {
+  try {
+    const filters = await productService.getProductFilters();
+    return res.status(200).json({ data: filters });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function getProduct(req, res, next) {
   try {
     const validationErrors = getValidationErrors(req);
@@ -73,6 +82,7 @@ async function getProduct(req, res, next) {
 }
 
 module.exports = {
+  getProductFilters,
   listProducts,
   getProduct,
 };

@@ -23,7 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# frontend/.gitignore
 .env
 .env.*
 !.env.example

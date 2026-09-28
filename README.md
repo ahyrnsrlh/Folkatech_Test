@@ -26,7 +26,7 @@ Implementasi aplikasi katalog produk kopi yang terdiri dari REST API backend dan
 ### Bonus
 
 - [x] **Mode response JSON:API** — tersedia ketika request menggunakan `Accept: application/vnd.api+json`; format JSON biasa tetap menjadi default.
-- [x] **Database tuning** — migration menambahkan indeks untuk kolom filter, pengurutan, dan pencarian gambar utama produk.
+- [x] **Database tuning** — indeks pada kolom filter/pengurutan dan lookup gambar; query berparameter dengan whitelist sorting; daftar produk menghindari N+1 dan membatasi `limit` maksimal 100.
 
 ## Teknologi
 
